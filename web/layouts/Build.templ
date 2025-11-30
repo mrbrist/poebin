@@ -1,6 +1,8 @@
 package layouts
 
-templ Build() {
+import "github.com/mrbrist/poebin/internal/r2"
+
+templ Build(build *r2.Build) {
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -9,7 +11,7 @@ templ Build() {
         <title>Build</title>
     </head>
     <body>
-        <b>Build</b>
+        { build.Raw }
     </body>
     </html>
 }

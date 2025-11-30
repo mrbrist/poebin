@@ -25,9 +25,10 @@ type r2 struct {
 	accessKeySecret string
 }
 
-type build struct {
+type Build struct {
 	LastModified *time.Time
 	Data         string
+	Raw          string
 }
 
 func Setup() (*r2, error) {
@@ -73,7 +74,7 @@ func (r2 *r2) NewBuild(raw string) (string, error) {
 	return id, nil
 }
 
-func (r2 *r2) GetBuild(id string) (*build, error) {
+func (r2 *r2) GetBuild(id string) (*Build, error) {
 	res, err := r2.client.GetObject(context.Background(), &s3.GetObjectInput{
 		Bucket: &r2.bucketName,
 		Key:    aws.String(id),
@@ -89,9 +90,10 @@ func (r2 *r2) GetBuild(id string) (*build, error) {
 		return nil, err
 	}
 
-	build := build{
+	// Construct build struct for use in template, decode pob export here
+	build := Build{
 		LastModified: res.LastModified,
-		Data:         string(data),
+		Raw:          string(data),
 	}
 
 	return &build, nil

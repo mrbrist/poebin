@@ -31,14 +31,15 @@ func main() {
 	})
 
 	r.GET("/:id", func(c *gin.Context) {
-		renderer := handler.New(c.Request.Context(), http.StatusOK, layouts.Build())
-		// id := c.Param("id")
+		id := c.Param("id")
 
-		// build, err := r2.GetBuild(id)
-		// if err != nil {
-		// 	c.Error(err)
-		//  return
-		// }
+		build, err := r2.GetBuild(id)
+		if err != nil {
+			c.Error(err)
+			return
+		}
+
+		renderer := handler.New(c.Request.Context(), http.StatusOK, layouts.Build(build))
 
 		c.Render(http.StatusOK, renderer)
 	})
