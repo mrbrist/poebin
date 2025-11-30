@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/xml"
 	"fmt"
+	"io"
 	"strings"
 )
 
@@ -181,20 +182,44 @@ type Items struct {
 }
 
 func (i *Items) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
-	type Alias Items
-	var alias Alias
-	if err := d.DecodeElement(&alias, &start); err != nil {
-		return err
-	}
-	i.ActiveItemSet = alias.ActiveItemSet
-	i.ItemList = alias.ItemList
-	i.ItemSets = alias.ItemSets
-	i.ItemMap = make(map[uint16]Item, len(alias.ItemList))
-	for _, item := range alias.ItemList {
-		if item.ID != nil {
-			i.ItemMap[*item.ID] = item
+	i.ItemMap = make(map[uint16]Item)
+	i.ItemList = []Item{}
+	i.ItemSets = []ItemSet{}
+
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			return err
+		}
+
+		switch elem := tok.(type) {
+		case xml.StartElement:
+			switch elem.Name.Local {
+			case "active_item_set":
+				var active uint16
+				if err := d.DecodeElement(&active, &elem); err == nil {
+					i.ActiveItemSet = &active
+				}
+			case "Item":
+				var item Item
+				if err := d.DecodeElement(&item, &elem); err != nil {
+					return err
+				}
+				i.ItemList = append(i.ItemList, item)
+				i.ItemMap[*item.ID] = item
+			case "ItemSet":
+				var set ItemSet
+				if err := d.DecodeElement(&set, &elem); err != nil {
+					return err
+				}
+				i.ItemSets = append(i.ItemSets, set)
+			}
 		}
 	}
+
 	return nil
 }
 
@@ -238,105 +263,231 @@ type ModRange struct {
 // ItemSet & Gear
 // ---------------------------
 type ItemSet struct {
-	ID    uint16  `xml:"id,attr"`
-	Title *string `xml:"title,attr,omitempty"`
-	Gear  Gear    `xml:"Gear"`
+	ID    uint16 `xml:"id,attr"`
+	Title string `xml:"title,attr,omitempty"`
+	Gear  Gear   `xml:"Gear"`
 }
 
-type Gear struct {
-	Weapon1     *uint16 `xml:"Weapon 1,omitempty"`
-	Weapon2     *uint16 `xml:"Weapon 2,omitempty"`
-	Weapon1Swap *uint16 `xml:"Weapon 1 Swap,omitempty"`
-	Weapon2Swap *uint16 `xml:"Weapon 2 Swap,omitempty"`
-	Helmet      *uint16 `xml:"Helmet,omitempty"`
-	BodyArmour  *uint16 `xml:"Body Armour,omitempty"`
-	Gloves      *uint16 `xml:"Gloves,omitempty"`
-	Boots       *uint16 `xml:"Boots,omitempty"`
-	Amulet      *uint16 `xml:"Amulet,omitempty"`
-	Ring1       *uint16 `xml:"Ring 1,omitempty"`
-	Ring2       *uint16 `xml:"Ring 2,omitempty"`
-	Belt        *uint16 `xml:"Belt,omitempty"`
-	Flask1      *uint16 `xml:"Flask 1,omitempty"`
-	Flask2      *uint16 `xml:"Flask 2,omitempty"`
-	Flask3      *uint16 `xml:"Flask 3,omitempty"`
-	Flask4      *uint16 `xml:"Flask 4,omitempty"`
-	Flask5      *uint16 `xml:"Flask 5,omitempty"`
-	Charm1      *uint16 `xml:"Charm 1,omitempty"`
-	Charm2      *uint16 `xml:"Charm 2,omitempty"`
-	Charm3      *uint16 `xml:"Charm 3,omitempty"`
-	Sockets     []uint16
-}
-
-// UnmarshalXML for Gear handles "nil" IDs safely
-func (g *Gear) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
-	type Slot struct {
-		ItemID string `xml:"itemId"`
-		Name   string `xml:"name"`
+func (is *ItemSet) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	for _, attr := range start.Attr {
+		switch attr.Name.Local {
+		case "id":
+			var id uint64
+			if _, err := fmt.Sscanf(attr.Value, "%d", &id); err == nil {
+				is.ID = uint16(id)
+			}
+		case "title":
+			is.Title = attr.Value
+		}
 	}
+
 	for {
 		tok, err := d.Token()
 		if err != nil {
-			break
+			if err == io.EOF {
+				break
+			}
+			return err
 		}
+
+		switch elem := tok.(type) {
+		case xml.StartElement:
+			switch elem.Name.Local {
+			case "Gear":
+				if err := d.DecodeElement(&is.Gear, &elem); err != nil {
+					return err
+				}
+
+			case "Slot":
+				var slot struct {
+					Name   string `xml:"name,attr"`
+					ItemID string `xml:"itemId,attr"`
+				}
+				if err := d.DecodeElement(&slot, &elem); err != nil {
+					return err
+				}
+
+				// Skip empty slots
+				if slot.ItemID == "" || slot.ItemID == "0" {
+					continue
+				}
+
+				// Assign to Gear
+				switch slot.Name {
+				case "Weapon 1":
+					is.Gear.Weapon1 = slot.ItemID
+				case "Weapon 2":
+					is.Gear.Weapon2 = slot.ItemID
+				case "Weapon 1 Swap":
+					is.Gear.Weapon1Swap = slot.ItemID
+				case "Weapon 2 Swap":
+					is.Gear.Weapon2Swap = slot.ItemID
+				case "Helmet":
+					is.Gear.Helmet = slot.ItemID
+				case "Body Armour":
+					is.Gear.BodyArmour = slot.ItemID
+				case "Gloves":
+					is.Gear.Gloves = slot.ItemID
+				case "Boots":
+					is.Gear.Boots = slot.ItemID
+				case "Amulet":
+					is.Gear.Amulet = slot.ItemID
+				case "Ring 1":
+					is.Gear.Ring1 = slot.ItemID
+				case "Ring 2":
+					is.Gear.Ring2 = slot.ItemID
+				case "Belt":
+					is.Gear.Belt = slot.ItemID
+				case "Flask 1":
+					is.Gear.Flask1 = slot.ItemID
+				case "Flask 2":
+					is.Gear.Flask2 = slot.ItemID
+				case "Flask 3":
+					is.Gear.Flask3 = slot.ItemID
+				case "Flask 4":
+					is.Gear.Flask4 = slot.ItemID
+				case "Flask 5":
+					is.Gear.Flask5 = slot.ItemID
+				case "Charm 1":
+					is.Gear.Charm1 = slot.ItemID
+				case "Charm 2":
+					is.Gear.Charm2 = slot.ItemID
+				case "Charm 3":
+					is.Gear.Charm3 = slot.ItemID
+				default:
+					is.Gear.Sockets = append(is.Gear.Sockets, slot.ItemID)
+				}
+
+			case "SocketIdURL":
+				var socket struct {
+					ItemID string `xml:"itemPbURL,attr"` // you can adjust attr if needed
+				}
+				if err := d.DecodeElement(&socket, &elem); err == nil && socket.ItemID != "" {
+					is.Gear.Sockets = append(is.Gear.Sockets, socket.ItemID)
+				}
+			}
+
+		case xml.EndElement:
+			if elem.Name.Local == start.Name.Local {
+				return nil
+			}
+		}
+	}
+
+	return nil
+}
+
+type Gear struct {
+	Weapon1     string   `xml:"Weapon 1,omitempty"`
+	Weapon2     string   `xml:"Weapon 2,omitempty"`
+	Weapon1Swap string   `xml:"Weapon 1 Swap,omitempty"`
+	Weapon2Swap string   `xml:"Weapon 2 Swap,omitempty"`
+	Helmet      string   `xml:"Helmet,omitempty"`
+	BodyArmour  string   `xml:"Body Armour,omitempty"`
+	Gloves      string   `xml:"Gloves,omitempty"`
+	Boots       string   `xml:"Boots,omitempty"`
+	Amulet      string   `xml:"Amulet,omitempty"`
+	Ring1       string   `xml:"Ring 1,omitempty"`
+	Ring2       string   `xml:"Ring 2,omitempty"`
+	Belt        string   `xml:"Belt,omitempty"`
+	Flask1      string   `xml:"Flask 1,omitempty"`
+	Flask2      string   `xml:"Flask 2,omitempty"`
+	Flask3      string   `xml:"Flask 3,omitempty"`
+	Flask4      string   `xml:"Flask 4,omitempty"`
+	Flask5      string   `xml:"Flask 5,omitempty"`
+	Charm1      string   `xml:"Charm 1,omitempty"`
+	Charm2      string   `xml:"Charm 2,omitempty"`
+	Charm3      string   `xml:"Charm 3,omitempty"`
+	Sockets     []string // generic sockets
+}
+
+func (g *Gear) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			return err
+		}
+
 		switch elem := tok.(type) {
 		case xml.StartElement:
 			if elem.Name.Local == "Slot" {
-				var s Slot
-				if err := d.DecodeElement(&s, &elem); err != nil {
+				var slot struct {
+					Name   string `xml:"name,attr"`
+					ItemID string `xml:"itemId,attr"`
+				}
+				if err := d.DecodeElement(&slot, &elem); err != nil {
 					return err
 				}
-				if s.ItemID == "nil" || s.ItemID == "" {
+
+				// Skip itemId="0" unless you want them stored
+				if slot.ItemID == "" || slot.ItemID == "0" {
 					continue
 				}
-				var val uint16
-				_, err := fmt.Sscanf(s.ItemID, "%d", &val)
-				if err != nil {
-					continue
-				}
-				switch s.Name {
+
+				switch slot.Name {
+				// Standard slots
 				case "Weapon 1":
-					g.Weapon1 = &val
+					g.Weapon1 = slot.ItemID
 				case "Weapon 2":
-					g.Weapon2 = &val
+					g.Weapon2 = slot.ItemID
 				case "Weapon 1 Swap":
-					g.Weapon1Swap = &val
+					g.Weapon1Swap = slot.ItemID
 				case "Weapon 2 Swap":
-					g.Weapon2Swap = &val
+					g.Weapon2Swap = slot.ItemID
 				case "Helmet":
-					g.Helmet = &val
+					g.Helmet = slot.ItemID
 				case "Body Armour":
-					g.BodyArmour = &val
+					g.BodyArmour = slot.ItemID
 				case "Gloves":
-					g.Gloves = &val
+					g.Gloves = slot.ItemID
 				case "Boots":
-					g.Boots = &val
+					g.Boots = slot.ItemID
 				case "Amulet":
-					g.Amulet = &val
+					g.Amulet = slot.ItemID
 				case "Ring 1":
-					g.Ring1 = &val
+					g.Ring1 = slot.ItemID
 				case "Ring 2":
-					g.Ring2 = &val
+					g.Ring2 = slot.ItemID
 				case "Belt":
-					g.Belt = &val
+					g.Belt = slot.ItemID
 				case "Flask 1":
-					g.Flask1 = &val
+					g.Flask1 = slot.ItemID
 				case "Flask 2":
-					g.Flask2 = &val
+					g.Flask2 = slot.ItemID
 				case "Flask 3":
-					g.Flask3 = &val
+					g.Flask3 = slot.ItemID
 				case "Flask 4":
-					g.Flask4 = &val
+					g.Flask4 = slot.ItemID
 				case "Flask 5":
-					g.Flask5 = &val
+					g.Flask5 = slot.ItemID
 				case "Charm 1":
-					g.Charm1 = &val
+					g.Charm1 = slot.ItemID
 				case "Charm 2":
-					g.Charm2 = &val
+					g.Charm2 = slot.ItemID
 				case "Charm 3":
-					g.Charm3 = &val
+					g.Charm3 = slot.ItemID
 				default:
-					g.Sockets = append(g.Sockets, val)
+					// Everything else goes into Sockets (Abyssal Sockets, unknowns)
+					g.Sockets = append(g.Sockets, slot.ItemID)
 				}
+			}
+
+			// Optional: capture SocketIdURL elements as generic sockets
+			if elem.Name.Local == "SocketIdURL" {
+				var socket struct {
+					ItemID string `xml:"itemPbURL,attr"` // sometimes itemId is in different attr
+				}
+				if err := d.DecodeElement(&socket, &elem); err == nil && socket.ItemID != "" {
+					g.Sockets = append(g.Sockets, socket.ItemID)
+				}
+			}
+
+		case xml.EndElement:
+			if elem.Name.Local == start.Name.Local {
+				return nil
 			}
 		}
 	}
