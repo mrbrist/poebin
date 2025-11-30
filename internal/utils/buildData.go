@@ -7,6 +7,8 @@ import (
 	"strings"
 )
 
+// TODO: This needs cleaning up and fixing things that are not being unmarshalled correctly
+
 // ---------------------------
 // PathOfBuildingVersion
 // ---------------------------

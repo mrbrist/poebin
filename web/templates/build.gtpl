@@ -8,7 +8,7 @@
     <title>Level {{ .Data.Build.Level }} {{ .Data.Build.AscendClassName }}</title>
 </head>
 <body>
-    {{ .Data.Items.ItemSets }}
+    {{ .Data }}
 
 </body>
 </html>
