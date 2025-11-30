@@ -60,23 +60,23 @@ func Setup() (*r2, error) {
 }
 
 func (r2 *r2) NewBuild(raw string) (string, error) {
-	key := shortuuid.New()
+	id := shortuuid.New()
 	_, err := r2.client.PutObject(context.Background(), &s3.PutObjectInput{
 		Bucket:      &r2.bucketName,
-		Key:         aws.String(key),
+		Key:         aws.String(id),
 		Body:        strings.NewReader(raw),
 		ContentType: aws.String("text/plain"),
 	})
 	if err != nil {
 		return "", err
 	}
-	return key, nil
+	return id, nil
 }
 
-func (r2 *r2) GetBuild(key string) (*build, error) {
+func (r2 *r2) GetBuild(id string) (*build, error) {
 	res, err := r2.client.GetObject(context.Background(), &s3.GetObjectInput{
 		Bucket: &r2.bucketName,
-		Key:    aws.String(key),
+		Key:    aws.String(id),
 	})
 	if err != nil {
 		return nil, err
