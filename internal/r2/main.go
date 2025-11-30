@@ -93,7 +93,7 @@ func (r2 *r2) GetBuild(id string) (*Build, error) {
 	}
 
 	// Construct build struct for use in template, decode pob export here
-	decoded, err := utils.Decode(string(data))
+	decoded, err := utils.RawToGo(string(data))
 	if err != nil {
 		return nil, err
 	}

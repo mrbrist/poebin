@@ -5,10 +5,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/mrbrist/poebin/internal/handler"
+	templates "github.com/mrbrist/poebin/internal/handler"
 	"github.com/mrbrist/poebin/internal/middleware"
 	"github.com/mrbrist/poebin/internal/r2"
-	"github.com/mrbrist/poebin/web/layouts"
 )
 
 func main() {
@@ -18,16 +17,22 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// Load templates
+	err = templates.LoadTemplates()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// Gin
 	r := gin.Default()
-	ginHtmlRenderer := r.HTMLRender
-	r.HTMLRender = &handler.HTMLTemplRenderer{FallbackHtmlRenderer: ginHtmlRenderer}
 
 	r.Use(middleware.ErrorHandler())
 
 	r.GET("/", func(c *gin.Context) {
-		renderer := handler.New(c.Request.Context(), http.StatusOK, layouts.Home())
-		c.Render(http.StatusOK, renderer)
+		c.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
+		if err := templates.Home(c.Writer, nil); err != nil {
+			log.Println(err)
+		}
 	})
 
 	r.GET("/:id", func(c *gin.Context) {
@@ -39,9 +44,10 @@ func main() {
 			return
 		}
 
-		renderer := handler.New(c.Request.Context(), http.StatusOK, layouts.Build(build))
-
-		c.Render(http.StatusOK, renderer)
+		c.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
+		if err := templates.Build(c.Writer, build); err != nil {
+			log.Println(err)
+		}
 	})
 
 	r.GET("/:id/raw", func(c *gin.Context) {
