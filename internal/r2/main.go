@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -16,7 +17,7 @@ import (
 	"github.com/lithammer/shortuuid/v4"
 )
 
-type R2 struct {
+type r2 struct {
 	client          *s3.Client
 	bucketName      string
 	accountID       string
@@ -24,13 +25,18 @@ type R2 struct {
 	accessKeySecret string
 }
 
-func Setup() (*R2, error) {
+type build struct {
+	LastModified *time.Time
+	Data         string
+}
+
+func Setup() (*r2, error) {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
 
-	r2 := &R2{
+	r2 := &r2{
 		bucketName:      os.Getenv("BUCKET_NAME"),
 		accountID:       os.Getenv("CLOUDFLARE_ACCOUNT_ID"),
 		accessKeyID:     os.Getenv("CLOUDFLARE_KEY_ID"),
@@ -53,7 +59,7 @@ func Setup() (*R2, error) {
 	return r2, nil
 }
 
-func (r2 *R2) NewBuild(raw string) error {
+func (r2 *r2) NewBuild(raw string) (string, error) {
 	key := shortuuid.New()
 	_, err := r2.client.PutObject(context.Background(), &s3.PutObjectInput{
 		Bucket:      &r2.bucketName,
@@ -62,27 +68,31 @@ func (r2 *R2) NewBuild(raw string) error {
 		ContentType: aws.String("text/plain"),
 	})
 	if err != nil {
-		return err
+		return "", err
 	}
-	fmt.Printf("Added build: %s\n", key)
-	return nil
+	return key, nil
 }
 
-func (r2 *R2) GetBuild(key string) (string, error) {
+func (r2 *r2) GetBuild(key string) (*build, error) {
 	res, err := r2.client.GetObject(context.Background(), &s3.GetObjectInput{
 		Bucket: &r2.bucketName,
 		Key:    aws.String(key),
 	})
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	defer res.Body.Close()
 
 	data, err := io.ReadAll(res.Body)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return string(data), nil
+	build := build{
+		LastModified: res.LastModified,
+		Data:         string(data),
+	}
+
+	return &build, nil
 }
