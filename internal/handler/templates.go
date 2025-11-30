@@ -9,7 +9,7 @@ import (
 var tmpl *template.Template
 
 func LoadTemplates() error {
-	tmplPath := filepath.Join("web", "templates", "*.html")
+	tmplPath := filepath.Join("web", "templates", "*.gtpl")
 	var err error
 	tmpl, err = template.ParseGlob(tmplPath)
 	return err
@@ -17,10 +17,10 @@ func LoadTemplates() error {
 
 // Build renders the build template
 func Build(w http.ResponseWriter, data interface{}) error {
-	return tmpl.ExecuteTemplate(w, "build.html", data)
+	return tmpl.ExecuteTemplate(w, "build.gtpl", data)
 }
 
 // Home renders the home template
 func Home(w http.ResponseWriter, data interface{}) error {
-	return tmpl.ExecuteTemplate(w, "home.html", data)
+	return tmpl.ExecuteTemplate(w, "home.gtpl", data)
 }
