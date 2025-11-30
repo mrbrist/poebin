@@ -17,11 +17,11 @@ import (
 )
 
 type R2 struct {
-	Client          *s3.Client
-	BucketName      string
-	AccountID       string
-	AccessKeyID     string
-	AccessKeySecret string
+	client          *s3.Client
+	bucketName      string
+	accountID       string
+	accessKeyID     string
+	accessKeySecret string
 }
 
 func Setup() (*R2, error) {
@@ -31,14 +31,14 @@ func Setup() (*R2, error) {
 	}
 
 	r2 := &R2{
-		BucketName:      os.Getenv("BUCKET_NAME"),
-		AccountID:       os.Getenv("CLOUDFLARE_ACCOUNT_ID"),
-		AccessKeyID:     os.Getenv("CLOUDFLARE_KEY_ID"),
-		AccessKeySecret: os.Getenv("CLOUDFLARE_KEY_SECRET"),
+		bucketName:      os.Getenv("BUCKET_NAME"),
+		accountID:       os.Getenv("CLOUDFLARE_ACCOUNT_ID"),
+		accessKeyID:     os.Getenv("CLOUDFLARE_KEY_ID"),
+		accessKeySecret: os.Getenv("CLOUDFLARE_KEY_SECRET"),
 	}
 
 	cfg, err := config.LoadDefaultConfig(context.TODO(),
-		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(r2.AccessKeyID, r2.AccessKeySecret, "")),
+		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(r2.accessKeyID, r2.accessKeySecret, "")),
 		config.WithRegion("auto"),
 	)
 	if err != nil {
@@ -46,17 +46,17 @@ func Setup() (*R2, error) {
 	}
 
 	client := s3.NewFromConfig(cfg, func(o *s3.Options) {
-		o.BaseEndpoint = aws.String(fmt.Sprintf("https://%s.r2.cloudflarestorage.com", r2.AccountID))
+		o.BaseEndpoint = aws.String(fmt.Sprintf("https://%s.r2.cloudflarestorage.com", r2.accountID))
 	})
 
-	r2.Client = client
+	r2.client = client
 	return r2, nil
 }
 
 func (r2 *R2) NewBuild(raw string) error {
 	key := shortuuid.New()
-	_, err := r2.Client.PutObject(context.Background(), &s3.PutObjectInput{
-		Bucket:      &r2.BucketName,
+	_, err := r2.client.PutObject(context.Background(), &s3.PutObjectInput{
+		Bucket:      &r2.bucketName,
 		Key:         aws.String(key),
 		Body:        strings.NewReader(raw),
 		ContentType: aws.String("text/plain"),
@@ -69,8 +69,8 @@ func (r2 *R2) NewBuild(raw string) error {
 }
 
 func (r2 *R2) GetBuild(key string) (string, error) {
-	res, err := r2.Client.GetObject(context.Background(), &s3.GetObjectInput{
-		Bucket: &r2.BucketName,
+	res, err := r2.client.GetObject(context.Background(), &s3.GetObjectInput{
+		Bucket: &r2.bucketName,
 		Key:    aws.String(key),
 	})
 	if err != nil {
