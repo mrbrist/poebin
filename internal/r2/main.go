@@ -15,6 +15,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/joho/godotenv"
 	"github.com/lithammer/shortuuid/v4"
+	"github.com/mrbrist/poebin/internal/utils"
 )
 
 type r2 struct {
@@ -27,8 +28,9 @@ type r2 struct {
 
 type Build struct {
 	LastModified *time.Time
-	Data         string
+	Id           string
 	Raw          string
+	Data         *utils.BuildData
 }
 
 func Setup() (*r2, error) {
@@ -91,9 +93,15 @@ func (r2 *r2) GetBuild(id string) (*Build, error) {
 	}
 
 	// Construct build struct for use in template, decode pob export here
+	decoded, err := utils.Decode(string(data))
+	if err != nil {
+		return nil, err
+	}
 	build := Build{
 		LastModified: res.LastModified,
+		Id:           id,
 		Raw:          string(data),
+		Data:         decoded,
 	}
 
 	return &build, nil

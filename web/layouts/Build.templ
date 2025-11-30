@@ -3,15 +3,15 @@ package layouts
 import "github.com/mrbrist/poebin/internal/r2"
 
 templ Build(build *r2.Build) {
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Build</title>
-    </head>
-    <body>
-        { build.Raw }
-    </body>
-    </html>
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>{ build.Id }</title>
+		</head>
+		<body>
+			{ build.Raw }
+		</body>
+	</html>
 }
