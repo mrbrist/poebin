@@ -8,6 +8,7 @@
     <title>Level {{ .Data.Build.Level }} {{ .Data.Build.AscendClassName }}</title>
 </head>
 <body>
-    {{ .Data.Build.ClassName }}
+    {{ .Data }}
+
 </body>
 </html>

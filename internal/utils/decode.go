@@ -12,16 +12,15 @@ import (
 	"golang.org/x/text/encoding/charmap"
 )
 
-func RawToGo(raw string) (*BuildData, error) {
+func RawToGo(raw string) (*PathOfBuilding, error) {
 	b, err := decompress(raw)
 	if err != nil {
 		return nil, err
 	}
 
-	var data BuildData
-	err = xml.Unmarshal([]byte(b), &data)
-	if err != nil {
-		return nil, err
+	var data PathOfBuilding
+	if err := xml.Unmarshal([]byte(b), &data); err != nil {
+		return nil, fmt.Errorf("XML unmarshal error: %w", err)
 	}
 
 	return &data, nil

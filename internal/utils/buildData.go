@@ -1,194 +1,365 @@
 package utils
 
-import "encoding/xml"
+import (
+	"encoding/xml"
+	"fmt"
+	"strings"
+)
 
-type BuildData struct {
-	XMLName xml.Name `xml:"PathOfBuilding"`
-	Text    string   `xml:",chardata"`
-	Build   struct {
-		Text                   string `xml:",chardata"`
-		ViewMode               string `xml:"viewMode,attr"`
-		AscendClassName        string `xml:"ascendClassName,attr"`
-		Bandit                 string `xml:"bandit,attr"`
-		PantheonMinorGod       string `xml:"pantheonMinorGod,attr"`
-		ClassName              string `xml:"className,attr"`
-		CharacterLevelAutoMode string `xml:"characterLevelAutoMode,attr"`
-		Level                  string `xml:"level,attr"`
-		MainSocketGroup        string `xml:"mainSocketGroup,attr"`
-		TargetVersion          string `xml:"targetVersion,attr"`
-		PantheonMajorGod       string `xml:"pantheonMajorGod,attr"`
-		PlayerStat             []struct {
-			Text  string `xml:",chardata"`
-			Stat  string `xml:"stat,attr"`
-			Value string `xml:"value,attr"`
-		} `xml:"PlayerStat"`
-		TimelessData struct {
-			Text               string `xml:",chardata"`
-			SearchList         string `xml:"searchList,attr"`
-			SearchListFallback string `xml:"searchListFallback,attr"`
-			DevotionVariant1   string `xml:"devotionVariant1,attr"`
-			DevotionVariant2   string `xml:"devotionVariant2,attr"`
-		} `xml:"TimelessData"`
-	} `xml:"Build"`
-	Calcs struct {
-		Text  string `xml:",chardata"`
-		Input []struct {
-			Text   string `xml:",chardata"`
-			String string `xml:"string,attr"`
-			Name   string `xml:"name,attr"`
-			Number string `xml:"number,attr"`
-		} `xml:"Input"`
-		Section []struct {
-			Text       string `xml:",chardata"`
-			Collapsed  string `xml:"collapsed,attr"`
-			Subsection string `xml:"subsection,attr"`
-			ID         string `xml:"id,attr"`
-		} `xml:"Section"`
-	} `xml:"Calcs"`
-	Notes string `xml:"Notes"`
-	Tree  struct {
-		Text       string `xml:",chardata"`
-		ActiveSpec string `xml:"activeSpec,attr"`
-		Spec       struct {
-			Text                   string `xml:",chardata"`
-			Nodes                  string `xml:"nodes,attr"`
-			TreeVersion            string `xml:"treeVersion,attr"`
-			AscendClassId          string `xml:"ascendClassId,attr"`
-			MasteryEffects         string `xml:"masteryEffects,attr"`
-			ClassId                string `xml:"classId,attr"`
-			SecondaryAscendClassId string `xml:"secondaryAscendClassId,attr"`
-			URL                    string `xml:"URL"`
-			Sockets                struct {
-				Text   string `xml:",chardata"`
-				Socket []struct {
-					Text   string `xml:",chardata"`
-					ItemId string `xml:"itemId,attr"`
-					NodeId string `xml:"nodeId,attr"`
-				} `xml:"Socket"`
-			} `xml:"Sockets"`
-			Overrides struct {
-				Text     string `xml:",chardata"`
-				Override []struct {
-					Text              string `xml:",chardata"`
-					Dn                string `xml:"dn,attr"`
-					NodeId            string `xml:"nodeId,attr"`
-					ActiveEffectImage string `xml:"activeEffectImage,attr"`
-					Icon              string `xml:"icon,attr"`
-				} `xml:"Override"`
-			} `xml:"Overrides"`
-		} `xml:"Spec"`
-	} `xml:"Tree"`
-	Config struct {
-		Text            string `xml:",chardata"`
-		ActiveConfigSet string `xml:"activeConfigSet,attr"`
-		ConfigSet       struct {
-			Text  string `xml:",chardata"`
-			ID    string `xml:"id,attr"`
-			Input []struct {
-				Text    string `xml:",chardata"`
-				Number  string `xml:"number,attr"`
-				Name    string `xml:"name,attr"`
-				String  string `xml:"string,attr"`
-				Boolean string `xml:"boolean,attr"`
-			} `xml:"Input"`
-			Placeholder []struct {
-				Text   string `xml:",chardata"`
-				Number string `xml:"number,attr"`
-				Name   string `xml:"name,attr"`
-			} `xml:"Placeholder"`
-		} `xml:"ConfigSet"`
-	} `xml:"Config"`
-	Skills struct {
-		Text                string `xml:",chardata"`
-		SortGemsByDPS       string `xml:"sortGemsByDPS,attr"`
-		DefaultGemLevel     string `xml:"defaultGemLevel,attr"`
-		ActiveSkillSet      string `xml:"activeSkillSet,attr"`
-		SortGemsByDPSField  string `xml:"sortGemsByDPSField,attr"`
-		ShowAltQualityGems  string `xml:"showAltQualityGems,attr"`
-		ShowSupportGemTypes string `xml:"showSupportGemTypes,attr"`
-		DefaultGemQuality   string `xml:"defaultGemQuality,attr"`
-		SkillSet            struct {
-			Text  string `xml:",chardata"`
-			ID    string `xml:"id,attr"`
-			Skill []struct {
-				Text                 string `xml:",chardata"`
-				Slot                 string `xml:"slot,attr"`
-				Enabled              string `xml:"enabled,attr"`
-				MainActiveSkillCalcs string `xml:"mainActiveSkillCalcs,attr"`
-				MainActiveSkill      string `xml:"mainActiveSkill,attr"`
-				IncludeInFullDPS     string `xml:"includeInFullDPS,attr"`
-				Label                string `xml:"label,attr"`
-				Gem                  []struct {
-					Text           string `xml:",chardata"`
-					QualityId      string `xml:"qualityId,attr"`
-					Count          string `xml:"count,attr"`
-					GemId          string `xml:"gemId,attr"`
-					Quality        string `xml:"quality,attr"`
-					SkillId        string `xml:"skillId,attr"`
-					NameSpec       string `xml:"nameSpec,attr"`
-					Enabled        string `xml:"enabled,attr"`
-					VariantId      string `xml:"variantId,attr"`
-					SkillPartCalcs string `xml:"skillPartCalcs,attr"`
-					SkillPart      string `xml:"skillPart,attr"`
-					EnableGlobal1  string `xml:"enableGlobal1,attr"`
-					Level          string `xml:"level,attr"`
-					EnableGlobal2  string `xml:"enableGlobal2,attr"`
-				} `xml:"Gem"`
-			} `xml:"Skill"`
-		} `xml:"SkillSet"`
-	} `xml:"Skills"`
-	Import struct {
-		Text              string `xml:",chardata"`
-		LastAccountHash   string `xml:"lastAccountHash,attr"`
-		LastCharacterHash string `xml:"lastCharacterHash,attr"`
-		LastRealm         string `xml:"lastRealm,attr"`
-		ExportParty       string `xml:"exportParty,attr"`
-	} `xml:"Import"`
-	Items struct {
-		Text                string `xml:",chardata"`
-		ActiveItemSet       string `xml:"activeItemSet,attr"`
-		ShowStatDifferences string `xml:"showStatDifferences,attr"`
-		UseSecondWeaponSet  string `xml:"useSecondWeaponSet,attr"`
-		Item                []struct {
-			Text     string `xml:",chardata"`
-			ID       string `xml:"id,attr"`
-			ModRange []struct {
-				Text  string `xml:",chardata"`
-				ID    string `xml:"id,attr"`
-				Range string `xml:"range,attr"`
-			} `xml:"ModRange"`
-		} `xml:"Item"`
-		ItemSet struct {
-			Text               string `xml:",chardata"`
-			ID                 string `xml:"id,attr"`
-			UseSecondWeaponSet string `xml:"useSecondWeaponSet,attr"`
-			SocketIdURL        []struct {
-				Text      string `xml:",chardata"`
-				ItemPbURL string `xml:"itemPbURL,attr"`
-				Name      string `xml:"name,attr"`
-				NodeId    string `xml:"nodeId,attr"`
-			} `xml:"SocketIdURL"`
-			Slot []struct {
-				Text      string `xml:",chardata"`
-				ItemId    string `xml:"itemId,attr"`
-				Name      string `xml:"name,attr"`
-				ItemPbURL string `xml:"itemPbURL,attr"`
-				Active    string `xml:"active,attr"`
-			} `xml:"Slot"`
-		} `xml:"ItemSet"`
-	} `xml:"Items"`
-	Party struct {
-		Text             string `xml:",chardata"`
-		Append           string `xml:"append,attr"`
-		Destination      string `xml:"destination,attr"`
-		ShowAdvanceTools string `xml:"ShowAdvanceTools,attr"`
-	} `xml:"Party"`
-	TreeView struct {
-		Text                string `xml:",chardata"`
-		ZoomLevel           string `xml:"zoomLevel,attr"`
-		ZoomY               string `xml:"zoomY,attr"`
-		ZoomX               string `xml:"zoomX,attr"`
-		SearchStr           string `xml:"searchStr,attr"`
-		ShowStatDifferences string `xml:"showStatDifferences,attr"`
-	} `xml:"TreeView"`
+// ---------------------------
+// PathOfBuildingVersion
+// ---------------------------
+type PathOfBuildingVersion struct {
+	PathOfExileOne *PathOfBuilding `xml:"PathOfBuilding,omitempty"`
+	PathOfExileTwo *PathOfBuilding `xml:"PathOfBuilding2,omitempty"`
+}
+
+// ---------------------------
+// PathOfBuilding
+// ---------------------------
+type PathOfBuilding struct {
+	Build  Build  `xml:"Build"`
+	Skills Skills `xml:"Skills"`
+	Tree   Tree   `xml:"Tree"`
+	Items  Items  `xml:"Items"`
+	Notes  string `xml:"Notes,omitempty"`
+	Config Config `xml:"Config"`
+}
+
+// ---------------------------
+// Build
+// ---------------------------
+type Build struct {
+	Level            uint8      `xml:"level,attr"`
+	ClassName        string     `xml:"className,attr"`
+	AscendClassName  *string    `xml:"ascendClassName,attr,omitempty"`
+	Bandit           *string    `xml:"bandit,attr,omitempty"`
+	PantheonMajorGod *string    `xml:"pantheonMajorGod,attr,omitempty"`
+	PantheonMinorGod *string    `xml:"pantheonMinorGod,attr,omitempty"`
+	MainSocketGroup  uint8      `xml:"mainSocketGroup,attr"`
+	Stats            []StatType `xml:"PlayerStat"`
+}
+
+type StatType struct {
+	Name  string `xml:"stat,attr"`
+	Value string `xml:"value,attr"`
+}
+
+type BuildStat struct {
+	Name  string `xml:"stat"`
+	Value string `xml:"value"`
+}
+
+// ---------------------------
+// Skills
+// ---------------------------
+type Skills struct {
+	SkillSets []SkillSet `xml:"SkillSet"`
+}
+
+type SkillSet struct {
+	Skills []Skill `xml:"Skill"`
+}
+
+type Skill struct {
+	Enabled bool   `xml:"enabled,attr"`
+	Slot    string `xml:"slot,attr"`
+	Gems    []Gem  `xml:"Gem"`
+}
+
+func (s Skill) SupportGems() []Gem {
+	var result []Gem
+	for _, g := range s.Gems {
+		if g.IsSupport() {
+			result = append(result, g)
+		}
+	}
+	return result
+}
+
+// ---------------------------
+// Gem
+// ---------------------------
+type Gem struct {
+	Name      string  `xml:"nameSpec"`
+	SkillID   *string `xml:"skill_id,omitempty"`
+	GemID     *string `xml:"gem_id,omitempty"`
+	QualityID *string `xml:"quality_id,omitempty"`
+	Enabled   bool    `xml:"enabled"`
+	Level     uint8   `xml:"level"`
+	Quality   uint8   `xml:"quality"`
+}
+
+func (g Gem) IsSupport() bool {
+	if g.GemID != nil {
+		return strings.HasPrefix(*g.GemID, "Metadata/Items/Gems/Support")
+	}
+	if g.SkillID != nil {
+		return strings.HasPrefix(*g.SkillID, "Support") || strings.HasSuffix(*g.SkillID, "Support")
+	}
+	return strings.Contains(g.Name, "Support")
+}
+
+func (g Gem) IsActive() bool {
+	return !g.IsSupport()
+}
+
+func (g Gem) IsVaal() bool {
+	return strings.HasPrefix(g.Name, "Vaal ")
+}
+
+func (g Gem) NonVaalName() string {
+	return strings.TrimPrefix(g.Name, "Vaal ")
+}
+
+func (g *Gem) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	type Inner struct {
+		Name      string  `xml:"nameSpec"`
+		SkillID   *string `xml:"skill_id"`
+		GemID     *string `xml:"gem_id"`
+		QualityID *string `xml:"quality_id"`
+		Enabled   *bool   `xml:"enabled"`
+		Level     *uint8  `xml:"level"`
+		Quality   *uint8  `xml:"quality"`
+	}
+	var inner Inner
+	if err := d.DecodeElement(&inner, &start); err != nil {
+		return err
+	}
+	g.Name = inner.Name
+	if g.Name == "" && inner.SkillID != nil {
+		g.Name = *inner.SkillID
+	}
+	g.SkillID = inner.SkillID
+	g.GemID = inner.GemID
+	g.QualityID = inner.QualityID
+	g.Enabled = true
+	if inner.Enabled != nil {
+		g.Enabled = *inner.Enabled
+	}
+	if inner.Level != nil {
+		g.Level = *inner.Level
+	}
+	if inner.Quality != nil {
+		g.Quality = *inner.Quality
+	}
+	return nil
+}
+
+// ---------------------------
+// Tree
+// ---------------------------
+type Tree struct {
+	Specs []Spec `xml:"Spec"`
+}
+
+type Spec struct {
+	Title   string   `xml:"title,attr"`
+	Nodes   string   `xml:"nodes,attr"`
+	Sockets []Socket `xml:"Sockets>Socket"`
+}
+
+type Socket struct {
+	NodeId int     `xml:"nodeId,attr"`
+	ItemId *uint16 `xml:"itemId,attr"` // pointer to allow "nil"
+}
+
+type Override struct {
+	Name   string `xml:"dn,omitempty"`
+	NodeID uint32 `xml:"nodeId,omitempty"`
+	Effect string `xml:",chardata"`
+}
+
+// ---------------------------
+// Items
+// ---------------------------
+type Items struct {
+	ActiveItemSet *uint16         `xml:"active_item_set,omitempty"`
+	ItemList      []Item          `xml:"Item"`
+	ItemMap       map[uint16]Item `xml:"-"` // build after unmarshal
+	ItemSets      []ItemSet       `xml:"ItemSet"`
+}
+
+func (i *Items) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	type Alias Items
+	var alias Alias
+	if err := d.DecodeElement(&alias, &start); err != nil {
+		return err
+	}
+	i.ActiveItemSet = alias.ActiveItemSet
+	i.ItemList = alias.ItemList
+	i.ItemSets = alias.ItemSets
+	i.ItemMap = make(map[uint16]Item, len(alias.ItemList))
+	for _, item := range alias.ItemList {
+		if item.ID != nil {
+			i.ItemMap[*item.ID] = item
+		}
+	}
+	return nil
+}
+
+type Item struct {
+	ID       *uint16    `xml:"id,attr"` // pointer allows nil
+	Content  string     `xml:",chardata"`
+	ModRange []ModRange `xml:"ModRange"`
+}
+
+func (i *Item) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	for _, attr := range start.Attr {
+		if attr.Name.Local == "id" {
+			if attr.Value == "nil" {
+				i.ID = nil
+			} else {
+				var val uint16
+				_, err := fmt.Sscanf(attr.Value, "%d", &val)
+				if err != nil {
+					return fmt.Errorf("invalid Item ID: %w", err)
+				}
+				i.ID = &val
+			}
+		}
+	}
+	type Alias Item
+	var tmp Alias
+	if err := d.DecodeElement(&tmp, &start); err != nil {
+		return err
+	}
+	i.Content = tmp.Content
+	i.ModRange = tmp.ModRange
+	return nil
+}
+
+type ModRange struct {
+	ID    int     `xml:"id,attr"`
+	Range float64 `xml:"range,attr"`
+}
+
+// ---------------------------
+// ItemSet & Gear
+// ---------------------------
+type ItemSet struct {
+	ID    uint16  `xml:"id,attr"`
+	Title *string `xml:"title,attr,omitempty"`
+	Gear  Gear    `xml:"Gear"`
+}
+
+type Gear struct {
+	Weapon1     *uint16 `xml:"Weapon 1,omitempty"`
+	Weapon2     *uint16 `xml:"Weapon 2,omitempty"`
+	Weapon1Swap *uint16 `xml:"Weapon 1 Swap,omitempty"`
+	Weapon2Swap *uint16 `xml:"Weapon 2 Swap,omitempty"`
+	Helmet      *uint16 `xml:"Helmet,omitempty"`
+	BodyArmour  *uint16 `xml:"Body Armour,omitempty"`
+	Gloves      *uint16 `xml:"Gloves,omitempty"`
+	Boots       *uint16 `xml:"Boots,omitempty"`
+	Amulet      *uint16 `xml:"Amulet,omitempty"`
+	Ring1       *uint16 `xml:"Ring 1,omitempty"`
+	Ring2       *uint16 `xml:"Ring 2,omitempty"`
+	Belt        *uint16 `xml:"Belt,omitempty"`
+	Flask1      *uint16 `xml:"Flask 1,omitempty"`
+	Flask2      *uint16 `xml:"Flask 2,omitempty"`
+	Flask3      *uint16 `xml:"Flask 3,omitempty"`
+	Flask4      *uint16 `xml:"Flask 4,omitempty"`
+	Flask5      *uint16 `xml:"Flask 5,omitempty"`
+	Charm1      *uint16 `xml:"Charm 1,omitempty"`
+	Charm2      *uint16 `xml:"Charm 2,omitempty"`
+	Charm3      *uint16 `xml:"Charm 3,omitempty"`
+	Sockets     []uint16
+}
+
+// UnmarshalXML for Gear handles "nil" IDs safely
+func (g *Gear) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	type Slot struct {
+		ItemID string `xml:"itemId"`
+		Name   string `xml:"name"`
+	}
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			break
+		}
+		switch elem := tok.(type) {
+		case xml.StartElement:
+			if elem.Name.Local == "Slot" {
+				var s Slot
+				if err := d.DecodeElement(&s, &elem); err != nil {
+					return err
+				}
+				if s.ItemID == "nil" || s.ItemID == "" {
+					continue
+				}
+				var val uint16
+				_, err := fmt.Sscanf(s.ItemID, "%d", &val)
+				if err != nil {
+					continue
+				}
+				switch s.Name {
+				case "Weapon 1":
+					g.Weapon1 = &val
+				case "Weapon 2":
+					g.Weapon2 = &val
+				case "Weapon 1 Swap":
+					g.Weapon1Swap = &val
+				case "Weapon 2 Swap":
+					g.Weapon2Swap = &val
+				case "Helmet":
+					g.Helmet = &val
+				case "Body Armour":
+					g.BodyArmour = &val
+				case "Gloves":
+					g.Gloves = &val
+				case "Boots":
+					g.Boots = &val
+				case "Amulet":
+					g.Amulet = &val
+				case "Ring 1":
+					g.Ring1 = &val
+				case "Ring 2":
+					g.Ring2 = &val
+				case "Belt":
+					g.Belt = &val
+				case "Flask 1":
+					g.Flask1 = &val
+				case "Flask 2":
+					g.Flask2 = &val
+				case "Flask 3":
+					g.Flask3 = &val
+				case "Flask 4":
+					g.Flask4 = &val
+				case "Flask 5":
+					g.Flask5 = &val
+				case "Charm 1":
+					g.Charm1 = &val
+				case "Charm 2":
+					g.Charm2 = &val
+				case "Charm 3":
+					g.Charm3 = &val
+				default:
+					g.Sockets = append(g.Sockets, val)
+				}
+			}
+		}
+	}
+	return nil
+}
+
+// ---------------------------
+// Config & Input
+// ---------------------------
+type Config struct {
+	ActiveConfigSet *string     `xml:"activeConfigSet,omitempty"`
+	ConfigSets      []ConfigSet `xml:"ConfigSet"`
+	Input           []Input     `xml:"Input"`
+}
+
+type ConfigSet struct {
+	ID    *string `xml:"id,omitempty"`
+	Input []Input `xml:"Input"`
+}
+
+type Input struct {
+	Name    string   `xml:"name"`
+	String  *string  `xml:"string,omitempty"`
+	Boolean *bool    `xml:"boolean,omitempty"`
+	Number  *float32 `xml:"number,omitempty"`
 }

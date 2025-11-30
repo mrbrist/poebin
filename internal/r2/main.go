@@ -30,7 +30,7 @@ type Build struct {
 	LastModified *time.Time
 	Id           string
 	Raw          string
-	Data         *utils.BuildData
+	Data         *utils.PathOfBuilding
 }
 
 func Setup() (*r2, error) {

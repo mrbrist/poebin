@@ -26,6 +26,8 @@ func main() {
 	// Gin
 	r := gin.Default()
 
+	r.SetTrustedProxies(nil)
+
 	r.Use(middleware.ErrorHandler())
 
 	r.Static("/assets", "web/static")
