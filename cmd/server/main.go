@@ -28,6 +28,8 @@ func main() {
 
 	r.Use(middleware.ErrorHandler())
 
+	r.Static("/assets", "web/static")
+
 	r.GET("/", func(c *gin.Context) {
 		c.Writer.Header().Set("Content-Type", "text/html; charset=utf-8")
 		if err := templates.Home(c.Writer, nil); err != nil {
@@ -62,5 +64,5 @@ func main() {
 		c.JSON(http.StatusOK, build)
 	})
 
-	r.Run()
+	r.Run("localhost:8080")
 }
