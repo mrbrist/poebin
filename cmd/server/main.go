@@ -13,7 +13,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	build, err := r2.GetBuild("mvz44hssVFeAwspmxNUpxo")
+	build, err := r2.GetBuild("dEgTYJTvyQMwKpGcUBvNUf")
 	if err != nil {
 		log.Fatal(err)
 	}
