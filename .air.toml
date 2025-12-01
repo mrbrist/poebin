@@ -5,10 +5,10 @@ tmp_dir = "tmp"
 
 [build]
 cmd = "go build -o ./tmp/main cmd/server/main.go"
-bin = "tmp/main"
+entrypoint = "tmp/main"
 full_bin = "APP_ENV=dev APP_USER=air ./tmp/main"
 include_ext = ["go", "tpl", "gtpl", "html"]
-exclude_dir = ["assets", "tmp", "vendor"]
+exclude_dir = ["assets", "tmp", "vendor", "node_modules"]
 include_dir = []
 exclude_file = []
 log = "air.log"
