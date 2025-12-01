@@ -1,5 +1,5 @@
 module.exports = {
- content: ["./web/**/*.gtpl"],
+ content: ["./web/**/*.gohtml"],
  theme: {
  extend: {}
  },

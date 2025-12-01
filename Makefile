@@ -10,12 +10,12 @@ MAIN_GO := cmd/server/main.go
 
 PROJECT_NAME := $(shell basename $(CURDIR))
 STATIC_DIR := web/static
-GTPL_FILES := $(shell find . -type f -name "*.gtpl")
+gohtml_FILES := $(shell find . -type f -name "*.gohtml")
 
 ALPINE_URL := https://cdn.jsdelivr.net/npm/alpinejs@latest/dist/cdn.min.js
 
 TAILWIND_CONFIG := 'module.exports = {\n\
-  content: ["./web/**/*.gtpl"],\n\
+  content: ["./web/**/*.gohtml"],\n\
   theme: {\n\
     extend: {}\n\
   },\n\
@@ -78,6 +78,6 @@ watch:
 	@printf "\n$(CYAN)Watching for changes$(RESET)\n"
 	@printf "$(DIM)────────────────────────────────────$(RESET)\n"
 	@printf "\n$(CYAN)Rebuilding...$(RESET)\n"
-	@find web/templates web/static/css -type f \( -name "*.gtpl" -o -name "input.css" \) | entr -r make serve
+	@find web/templates web/static/css -type f \( -name "*.gohtml" -o -name "input.css" \) | entr -r make serve
 
 
