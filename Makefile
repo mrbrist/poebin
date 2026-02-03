@@ -1,83 +1,41 @@
-CYAN := \033[36m
-DIM := \033[2m
-RESET := \033[0m
-CHECK := ✓
-ARROW := →
+.PHONY: setup setup-fe setup-be start-be start-fe dev
 
-GO_BIN := $(shell which go)
-BUN_BIN := $(shell which bun)
-MAIN_GO := cmd/server/main.go
+setup: setup-be setup-fe
+	@echo "✅ Full stack dev environment ready"
 
-PROJECT_NAME := $(shell basename $(CURDIR))
-STATIC_DIR := web/static
-gohtml_FILES := $(shell find . -type f -name "*.gohtml")
+# ---------- BACKEND ----------
+setup-be:
+	@echo "🔧 Setting up Go backend"
+	mkdir -p backend/internal/handlers backend/internal/utils
+	cd backend && go mod init backend
+	cd backend && go get github.com/joho/godotenv
 
-ALPINE_URL := https://cdn.jsdelivr.net/npm/alpinejs@latest/dist/cdn.min.js
+	echo 'package main\r\n\r\nimport (\r\n\t"backend/internal/handlers"\r\n\t"backend/internal/utils"\r\n\t"log"\r\n\t"net/http"\r\n)\r\n\r\nfunc main() {\r\n\tenvCfg := utils.SetupEnvCfg()\r\n\r\n\tcfg := &handlers.APIConfig{\r\n\t\tEnv: envCfg,\r\n\t}\r\n\r\n\tmux := http.NewServeMux()\r\n\r\n\t// System\r\n\tmux.HandleFunc("/health", cfg.Health)\r\n\r\n\tsrv := &http.Server{\r\n\t\tAddr:    ":" + cfg.Env.Port,\r\n\t\tHandler: mux,\r\n\t}\r\n\r\n\tlog.Printf("Serving on: http://localhost:%s/\\n", cfg.Env.Port)\r\n\tlog.Fatal(srv.ListenAndServe())\r\n}' > backend/main.go
+	
+	echo 'package handlers\r\n\r\nimport (\r\n\t"net/http"\r\n)\r\n\r\nfunc (cfg *APIConfig) Health(w http.ResponseWriter, r *http.Request) {\r\n\tw.WriteHeader(http.StatusOK)\r\n\tw.Write([]byte("OK"))\r\n}' > backend/internal/handlers/health.go
 
-TAILWIND_CONFIG := 'module.exports = {\n\
-  content: ["./web/**/*.gohtml"],\n\
-  theme: {\n\
-    extend: {}\n\
-  },\n\
-  plugins: []\n\
-}'
+	echo 'package handlers\r\n\r\nimport "backend/internal/utils"\r\n\r\ntype APIConfig struct {\r\n\tEnv *utils.EnvCfg\r\n}' > backend/internal/handlers/apiCfg.go
 
-# ----------------------
-# Build / Run Targets
-# ----------------------
+	echo 'package utils\r\n\r\nimport (\r\n\t"log"\r\n\t"os"\r\n\r\n\t"github.com/joho/godotenv"\r\n)\r\n\r\ntype EnvCfg struct {\r\n\tPort string\r\n}\r\n\r\nfunc SetupEnvCfg() *EnvCfg {\r\n\tgodotenv.Load(".env")\r\n\r\n\tport := os.Getenv("PORT")\r\n\tif port == "" {\r\n\t\tlog.Fatal("PORT environment variable is not set")\r\n\t}\r\n\r\n\treturn &EnvCfg{\r\n\t\tPort: port,\r\n\t}\r\n}' > backend/internal/utils/env.go
 
-run:
-	@$(GO_BIN) run $(MAIN_GO)
+	echo 'PORT=8080' > backend/.env
+	echo '.env' > backend/.gitignore
 
-run-compiled:
-	@./build/main
+# ---------- FRONTEND ----------
+setup-fe:
+	@echo "🎨 Setting up React frontend"
+	npx create-vite@latest frontend -- --template react-ts
+	cd frontend && npm install
+	cd frontend && npm install -D tailwindcss postcss autoprefixer
+	cd frontend && npx tailwindcss init -p
+	cd frontend && sed -i 's/content: \\[\\]/content: ["\\.\\/index.html","\\.\\/src\\/**\\/*.{js,ts,jsx,tsx}"]/' tailwind.config.js
+	cd frontend && echo "@tailwind base;\n@tailwind components;\n@tailwind utilities;" > src/index.css
 
-compile:
-	@$(GO_BIN) build -o build/main $(MAIN_GO)
+# ---------- DEV ----------
+start-be:
+	cd backend && go run .
 
-# ----------------------
-# Assets
-# ----------------------
+start-fe:
+	cd frontend && npm run dev
 
-download-alpine:
-	@printf "\n$(CYAN)Downloading Alpine.js$(RESET)\n"
-	@printf "$(DIM)────────────────────────────────────$(RESET)\n"
-	@mkdir -p $(STATIC_DIR)/js
-	@curl -s $(ALPINE_URL) -o $(STATIC_DIR)/js/alpine.min.js
-	@printf "$(CHECK) Alpine.js ready\n"
-
-setup-tailwind:
-	@printf "\n$(CYAN)Setting up Tailwind CSS$(RESET)\n"
-	@printf "$(DIM)────────────────────────────────────$(RESET)\n"
-	@$(BUN_BIN) install tailwindcss @tailwindcss/cli >/dev/null 2>&1
-	@echo $(TAILWIND_CONFIG) > tailwind.config.js
-	@echo '@tailwind base;\n@tailwind components;\n@tailwind utilities;' > $(STATIC_DIR)/css/input.css
-	@printf "$(CHECK) Tailwind CSS ready\n"
-
-css:
-	@printf "\n$(CYAN)Generating CSS$(RESET)\n"
-	@printf "$(DIM)────────────────────────────────────$(RESET)\n"
-	@$(BUN_BIN) tailwindcss -i $(STATIC_DIR)/css/input.css -o $(STATIC_DIR)/css/styles.css --minify
-	@printf "$(CHECK) CSS generated\n"
-
-# ----------------------
-# Serve
-# ----------------------
-
-serve:
-	@printf "\n$(CYAN)Starting server$(RESET)\n"
-	@printf "$(DIM)────────────────────────────────────$(RESET)\n"
-	@$(GO_BIN) run $(MAIN_GO) & 
-	@$(BUN_BIN) tailwindcss -i $(STATIC_DIR)/css/input.css -o $(STATIC_DIR)/css/styles.css --minify
-
-# ----------------------
-# Watch with Hot Reload
-# ----------------------
-
-watch:
-	@printf "\n$(CYAN)Watching for changes$(RESET)\n"
-	@printf "$(DIM)────────────────────────────────────$(RESET)\n"
-	@printf "\n$(CYAN)Rebuilding...$(RESET)\n"
-	@find web/templates web/static/css -type f \( -name "*.gohtml" -o -name "input.css" \) | entr -r make serve
-
-
+dev: start-be start-fe
