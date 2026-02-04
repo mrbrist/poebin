@@ -1,6 +1,9 @@
 import { useState } from "react";
 
 function handlePaste(paste: string) {
+    if (!paste) {
+        return;
+    }
     console.log(paste);
 }
 
