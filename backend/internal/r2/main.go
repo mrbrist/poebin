@@ -64,8 +64,13 @@ func Setup() (*R2, error) {
 }
 
 func (r2 *R2) NewBuild(raw string) (string, error) {
+	_, err := utils.RawToGo(raw)
+	if err != nil {
+		return "", err
+	}
+
 	id := shortuuid.New()
-	_, err := r2.client.PutObject(context.Background(), &s3.PutObjectInput{
+	_, err = r2.client.PutObject(context.Background(), &s3.PutObjectInput{
 		Bucket:      &r2.bucketName,
 		Key:         aws.String(id),
 		Body:        strings.NewReader(raw),

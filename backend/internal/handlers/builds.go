@@ -34,18 +34,23 @@ func (cfg *APIConfig) NewBuild(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	is_valid, err := utils.IsValidBuild(params.Raw)
-	if err != nil {
-		utils.RespondWithError(w, http.StatusInternalServerError, "Couldn't validte build", err)
-		return
-	}
+	// Not sure if this is actully needed, commented out in case i need it in the future
+	// is_valid, err := utils.IsValidBuild(params.Raw)
+	// if err != nil {
+	// 	utils.RespondWithError(w, http.StatusInternalServerError, "Couldn't validte build", err)
+	// 	return
+	// }
 
-	if !is_valid {
-		utils.RespondWithError(w, http.StatusInternalServerError, "Build is invalid", nil)
-		return
-	}
+	// if !is_valid {
+	// 	utils.RespondWithError(w, http.StatusInternalServerError, "Build is invalid", nil)
+	// 	return
+	// }
 
 	build_id, err := cfg.R2.NewBuild(params.Raw)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusBadRequest, "Error creating build", err)
+		return
+	}
 
 	utils.RespondWithJSON(w, http.StatusOK, build{ID: build_id})
 }
