@@ -63,10 +63,10 @@ func Setup() (*R2, error) {
 	return r2, nil
 }
 
-func (r2 *R2) NewBuild(raw string) (string, error) {
-	_, err := utils.RawToGo(raw)
+func (r2 *R2) NewBuild(raw string) (string, uint8, string, error) {
+	build, err := utils.RawToGo(raw)
 	if err != nil {
-		return "", err
+		return "", 0, "", err
 	}
 
 	id := shortuuid.New()
@@ -77,9 +77,15 @@ func (r2 *R2) NewBuild(raw string) (string, error) {
 		ContentType: aws.String("text/plain"),
 	})
 	if err != nil {
-		return "", err
+		return "", 0, "", err
 	}
-	return id, nil
+
+	asc := build.Build.ClassName
+	if build.Build.AscendClassName != nil {
+		asc = *build.Build.AscendClassName
+	}
+
+	return id, build.Build.Level, asc, nil
 }
 
 func (r2 *R2) GetBuild(id string) (*Build, error) {

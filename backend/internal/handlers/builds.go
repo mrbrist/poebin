@@ -46,11 +46,29 @@ func (cfg *APIConfig) NewBuild(w http.ResponseWriter, r *http.Request) {
 	// 	return
 	// }
 
-	build_id, err := cfg.R2.NewBuild(params.Raw)
+	build_id, level, class, err := cfg.R2.NewBuild(params.Raw)
 	if err != nil {
 		utils.RespondWithError(w, http.StatusBadRequest, "Error creating build", err)
 		return
 	}
 
+	// Append this build to the recent builds stored in memory
+	cfg.RecentBuilds = append(cfg.RecentBuilds, RecentBuild{
+		ID:    build_id,
+		Level: level,
+		Class: class,
+	})
+
 	utils.RespondWithJSON(w, http.StatusOK, build{ID: build_id})
+}
+
+func (cfg *APIConfig) GetRecentBuilds(w http.ResponseWriter, r *http.Request) {
+	if len(cfg.RecentBuilds) == 0 {
+		utils.RespondWithJSON(w, 200, [2]RecentBuild{
+			{ID: "cNHxLQX23eEGYD3TAC8vsE", Level: 100, Class: "Hierophant"},
+			{ID: "naJZBYXhayPPniJDKE4U7m", Level: 100, Class: "Surfcaster"},
+		})
+		return
+	}
+	utils.RespondWithJSON(w, 200, cfg.RecentBuilds)
 }

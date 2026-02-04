@@ -17,9 +17,12 @@ func main() {
 		log.Fatal(err)
 	}
 
+	var recentBuilds []handlers.RecentBuild
+
 	cfg := &handlers.APIConfig{
-		Env: envCfg,
-		R2:  r2,
+		Env:          envCfg,
+		R2:           r2,
+		RecentBuilds: recentBuilds,
 	}
 
 	mux := http.NewServeMux()
@@ -30,6 +33,8 @@ func main() {
 	// Builds
 	mux.HandleFunc("GET /api/getBuild/{id}", cfg.GetBuild)
 	mux.HandleFunc("POST /api/newBuild", cfg.NewBuild)
+
+	mux.HandleFunc("GET /api/recent", cfg.GetRecentBuilds)
 
 	srv := &http.Server{
 		Addr:    ":" + cfg.Env.Port,
