@@ -6,9 +6,10 @@ import (
 )
 
 type RecentBuild struct {
-	ID    string
-	Level uint8
-	Class string
+	ID        string
+	Level     uint8
+	Class     string
+	DateAdded int64
 }
 
 type APIConfig struct {

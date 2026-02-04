@@ -4,6 +4,7 @@ import (
 	"backend/internal/utils"
 	"encoding/json"
 	"net/http"
+	"time"
 )
 
 type newBuildParams struct {
@@ -54,9 +55,10 @@ func (cfg *APIConfig) NewBuild(w http.ResponseWriter, r *http.Request) {
 
 	// Append this build to the recent builds stored in memory
 	cfg.RecentBuilds = append(cfg.RecentBuilds, RecentBuild{
-		ID:    build_id,
-		Level: level,
-		Class: class,
+		ID:        build_id,
+		Level:     level,
+		Class:     class,
+		DateAdded: time.Now().UnixMilli(),
 	})
 
 	utils.RespondWithJSON(w, http.StatusOK, build{ID: build_id})
@@ -65,8 +67,8 @@ func (cfg *APIConfig) NewBuild(w http.ResponseWriter, r *http.Request) {
 func (cfg *APIConfig) GetRecentBuilds(w http.ResponseWriter, r *http.Request) {
 	if len(cfg.RecentBuilds) == 0 {
 		utils.RespondWithJSON(w, 200, [2]RecentBuild{
-			{ID: "cNHxLQX23eEGYD3TAC8vsE", Level: 100, Class: "Hierophant"},
-			{ID: "naJZBYXhayPPniJDKE4U7m", Level: 100, Class: "Surfcaster"},
+			{ID: "cNHxLQX23eEGYD3TAC8vsE", Level: 100, Class: "Hierophant", DateAdded: 1769733065986},
+			{ID: "naJZBYXhayPPniJDKE4U7m", Level: 100, Class: "Surfcaster", DateAdded: 1769233765986},
 		})
 		return
 	}
