@@ -7,7 +7,6 @@ import (
 	"log"
 	"os"
 	"strings"
-	"time"
 
 	"backend/internal/utils"
 
@@ -28,7 +27,7 @@ type R2 struct {
 }
 
 type Build struct {
-	LastModified *time.Time
+	LastModified int64
 	Id           string
 	Raw          string
 	Data         *utils.PathOfBuilding
@@ -110,7 +109,7 @@ func (r2 *R2) GetBuild(id string) (*Build, error) {
 		return nil, err
 	}
 	build := Build{
-		LastModified: res.LastModified,
+		LastModified: res.LastModified.UnixMilli(),
 		Id:           id,
 		Raw:          string(data),
 		Data:         decoded,
