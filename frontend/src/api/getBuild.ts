@@ -1,7 +1,7 @@
 import { API_BASE } from "./consts";
 
 export interface buildData {
-    LastModified: bigint;
+    LastModified: number;
     Id: string;
     Raw: string;
     Data: JSON;

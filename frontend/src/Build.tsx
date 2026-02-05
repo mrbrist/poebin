@@ -21,7 +21,7 @@ function Build() {
 
     useEffect(() => {
         if (!id) {
-            navigate("/", { replace: true });
+            navigate("/");
             return;
         }
 
