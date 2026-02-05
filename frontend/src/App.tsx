@@ -1,14 +1,21 @@
 import { useState } from "react";
+import { newBuild } from "./api/newBuild";
+import { useNavigate } from "react-router-dom";
 
-function handlePaste(paste: string) {
+async function handlePaste(paste: string, nav: any) {
     if (!paste) {
         return;
     }
-    console.log(paste);
+    const id = await newBuild(paste);
+    if (!id) {
+        return;
+    }
+    nav("/" + id, { replace: true });
 }
 
 function App() {
     const [paste, setPaste] = useState("");
+    const navigate = useNavigate();
     return (
         <div className="min-h-screen flex justify-center p-4">
             <div className="w-full max-w-2xl rounded-2xl p-6">
@@ -25,7 +32,7 @@ function App() {
 
                 <button
                     className="mt-2 px-5 py-2 rounded-xl bg-blue-600 text-white font-medium hover:bg-blue-500 active:bg-blue-700 transition w-10/12"
-                    onClick={() => handlePaste(paste)}
+                    onClick={() => handlePaste(paste, navigate)}
                 >
                     Create
                 </button>

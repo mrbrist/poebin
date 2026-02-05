@@ -2,6 +2,7 @@ package main
 
 import (
 	"backend/internal/handlers"
+	"backend/internal/middleware"
 	"backend/internal/r2"
 	"backend/internal/utils"
 	"log"
@@ -38,7 +39,7 @@ func main() {
 
 	srv := &http.Server{
 		Addr:    ":" + cfg.Env.Port,
-		Handler: mux,
+		Handler: middleware.CORSMiddleware(mux),
 	}
 
 	log.Printf("Serving on: http://localhost:%s/\n", cfg.Env.Port)
