@@ -19,6 +19,15 @@ function Build() {
 
     const [build, setBuild] = useState<buildData | undefined>();
 
+    const buildClass =
+        build?.Data.Build.AscendClassName == "None"
+            ? build.Data.Build.ClassName
+            : build?.Data.Build.AscendClassName;
+    const title = `Level ${build?.Data.Build.Level} ${buildClass}`;
+    document.title = title;
+
+    console.log(build);
+
     useEffect(() => {
         if (!id) {
             navigate("/");
