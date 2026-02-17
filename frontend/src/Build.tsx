@@ -40,7 +40,17 @@ function Build() {
         init();
     }, []);
 
-    return <div>{build?.Id} page</div>;
+    return (
+        <div>
+            <h1
+                className="text-2xl font-semibold mb-4 mt-4 text-slate-100 cursor-pointer"
+                onClick={() => navigate("/")}
+            >
+                poeb.in
+            </h1>
+            {build?.Id} page
+        </div>
+    );
 }
 
 export default Build;
