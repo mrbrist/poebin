@@ -4,7 +4,7 @@ export interface buildData {
     LastModified: number;
     Id: string;
     Raw: string;
-    Data: JSON;
+    Data: any;
 }
 
 export async function getBuild(id: string) {
