@@ -1,10 +1,10 @@
 import { type buildData } from "../api/getBuild";
 import { timeAgo } from "../helpers/timeAgo";
 
-function BuildInfo({ build }: { build: buildData | undefined }) {
+function BuildSide({ build }: { build: buildData | undefined }) {
     return (
         <aside className="col-span-3 space-y-6">
-            <div className="rounded-2xl bg-slate-900 border border-slate-400 p-6 shadow-lg">
+            <div className="rounded-2xl bg-slate-900 border border-slate-400 p-4 shadow-lg">
                 <h2 className="text-lg font-semibold mb-4">Build Info</h2>
                 <div className="space-y-2 text-sm text-zinc-400">
                     <div>
@@ -70,4 +70,4 @@ function BuildInfo({ build }: { build: buildData | undefined }) {
     );
 }
 
-export default BuildInfo;
+export default BuildSide;

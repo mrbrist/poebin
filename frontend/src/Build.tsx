@@ -3,7 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { getBuild, type buildData } from "./api/getBuild";
 
 // Build Segments
-import BuildInfo from "./build_segments/build_info";
+import BuildSide from "./build_segments/build_side";
+import BuildMain from "./build_segments/build_main";
 
 async function handleBuild(
     id: string,
@@ -52,7 +53,8 @@ function Build() {
                 poeb.in
             </h1>
             <div className="max-w-7xl mx-auto grid grid-cols-12 gap-6 px-6 py-6">
-                <BuildInfo build={build} />
+                <BuildSide build={build} />
+                <BuildMain build={build} />
             </div>
         </div>
     );
