@@ -3,7 +3,7 @@ import { parseItem } from "../helpers/item_parser";
 
 function BuildItems({ build }: { build: buildData | undefined }) {
     return (
-        <div>
+        <div className="block text-left">
             {build?.Data.Items.ItemList.map(
                 (item: { Content: any }, index: number) => (
                     <span
