@@ -17,7 +17,7 @@ export function parseItem(raw: any) {
     let item: itemData = {
         Name: itemSplit[2],
         Base: itemSplit[3],
-        Rarity: itemSplit[1],
+        Rarity: itemSplit[1].split(" ")[1].toLowerCase(),
         Quality: itemSplit[10],
         Sockets: itemSplit[11],
         ItemLevel: itemSplit[9],

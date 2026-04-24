@@ -45,11 +45,8 @@ function BuildMain({ build }: { build: buildData | undefined }) {
                     Skills
                 </button>
             </div>
-
             {activeTab === "items" && <BuildItems build={build} />}
-
             {activeTab === "tree" && <BuildTree build={build} />}
-
             {activeTab === "skills" && <BuildSkills build={build} />}
         </div>
     );

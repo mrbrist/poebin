@@ -5,6 +5,7 @@ import { getBuild, type buildData } from "./api/getBuild";
 // Build Segments
 import BuildSide from "./build_segments/build_side";
 import BuildMain from "./build_segments/build_main";
+import BuildNotes from "./build_segments/build_notes";
 
 async function handleBuild(
     id: string,
@@ -55,6 +56,9 @@ function Build() {
             <div className="max-w-7xl mx-auto grid grid-cols-12 gap-6 px-6 py-6">
                 <BuildSide build={build} />
                 <BuildMain build={build} />
+            </div>
+            <div className="px-6 mb-5">
+                <BuildNotes build={build} />
             </div>
         </div>
     );

@@ -6,7 +6,10 @@ function BuildItems({ build }: { build: buildData | undefined }) {
         <div>
             {build?.Data.Items.ItemList.map(
                 (item: { Content: any }, index: number) => (
-                    <span key={index} className="block">
+                    <span
+                        key={index}
+                        className={`block ${parseItem(item.Content).Rarity}`}
+                    >
                         {parseItem(item.Content).Name}
                     </span>
                 ),

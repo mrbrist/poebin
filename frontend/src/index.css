@@ -4,3 +4,19 @@
   margin: 0 auto;
   text-align: center;
 }
+
+.rare {
+  color: rgb(255,255,119);
+}
+
+.magic {
+  color: rgb(136,136,255);
+}
+
+.unique {
+  color: rgb(175,96,37);
+}
+
+.normal {
+  color: rgb(200,200,200)
+}
