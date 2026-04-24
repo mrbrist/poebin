@@ -16,7 +16,7 @@ function BuildMain({ build }: { build: buildData | undefined }) {
                     className={`px-3 py-1 rounded-t-lg ${
                         activeTab === "items"
                             ? "bg-slate-700 font-semibold"
-                            : "text-zinc-400"
+                            : "text-zinc-400 hover:bg-slate-800"
                     }`}
                     onClick={() => setActiveTab("items")}
                 >
@@ -27,7 +27,7 @@ function BuildMain({ build }: { build: buildData | undefined }) {
                     className={`px-3 py-1 rounded-t-lg ${
                         activeTab === "tree"
                             ? "bg-slate-700 font-semibold"
-                            : "text-zinc-400"
+                            : "text-zinc-400 hover:bg-slate-800"
                     }`}
                     onClick={() => setActiveTab("tree")}
                 >
@@ -38,7 +38,7 @@ function BuildMain({ build }: { build: buildData | undefined }) {
                     className={`px-3 py-1 rounded-t-lg ${
                         activeTab === "skills"
                             ? "bg-slate-700 font-semibold"
-                            : "text-zinc-400"
+                            : "text-zinc-400 hover:bg-slate-800"
                     }`}
                     onClick={() => setActiveTab("skills")}
                 >
