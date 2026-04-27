@@ -43,8 +43,16 @@ function BuildItems({ build }: { build: buildData | undefined }) {
                     if (!item) return null;
 
                     return (
-                        <span key={slot} className={`block ${item.Rarity}`}>
-                            {slot}: {item.Name}
+                        <span className="flex max-w-xl items-center">
+                            <span className="w-2/8 whitespace-nowrap">
+                                {slot}:
+                            </span>
+
+                            <span
+                                className={`${item.Rarity} flex-1 text-left whitespace-nowrap overflow-hidden text-ellipsis`}
+                            >
+                                {item.Name}
+                            </span>
                         </span>
                     );
                 })}
