@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { buildData } from "../api/getBuild";
 import { parseItem } from "../helpers/item_parser";
 
@@ -7,15 +8,47 @@ function BuildItems({ build }: { build: buildData | undefined }) {
 
     if (!itemList || !sets) return null;
 
-    const items = itemList.map((e: { Content: any }) => parseItem(e.Content));
+    // simple lookup
+    const itemMap: Record<string, any> = {};
+    itemList.forEach((e: { ID: string | number; Content: any }) => {
+        itemMap[e.ID] = parseItem(e.Content);
+    });
+
+    const [selectedSetId, setSelectedSetId] = useState(sets[0].ID);
+    const selectedSet = sets.find((s: { ID: any }) => s.ID === selectedSetId);
+
+    if (!selectedSet) return null;
 
     return (
         <div className="block text-left">
-            {items.map((item: any, index: any) => (
-                <span key={item.ID ?? index} className={`block ${item.Rarity}`}>
-                    {item.Name}
-                </span>
-            ))}
+            {/* Dropdown */}
+            <select
+                value={selectedSetId}
+                onChange={(e) => setSelectedSetId(Number(e.target.value))}
+                className="mb-4 p-2 border rounded"
+            >
+                {sets.map((set: any) => (
+                    <option key={set.ID} value={set.ID}>
+                        {set.Title}
+                    </option>
+                ))}
+            </select>
+
+            {/* Items */}
+            <div>
+                {Object.entries(selectedSet.Gear).map(([slot, id]) => {
+                    if (!id || typeof id !== "string") return null;
+
+                    const item = itemMap[id];
+                    if (!item) return null;
+
+                    return (
+                        <span key={slot} className={`block ${item.Rarity}`}>
+                            {slot}: {item.Name}
+                        </span>
+                    );
+                })}
+            </div>
         </div>
     );
 }
