@@ -34,7 +34,7 @@ function BuildMain({ build }: { build: buildData | undefined }) {
                     Tree
                 </button>
 
-                <button
+                {/* <button
                     className={`px-3 py-1 rounded-t-lg ${
                         activeTab === "skills"
                             ? "bg-slate-700 font-semibold"
@@ -43,7 +43,7 @@ function BuildMain({ build }: { build: buildData | undefined }) {
                     onClick={() => setActiveTab("skills")}
                 >
                     Skills
-                </button>
+                </button> */}
             </div>
             {activeTab === "items" && <BuildItems build={build} />}
             {activeTab === "tree" && <BuildTree build={build} />}
