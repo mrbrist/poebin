@@ -21,18 +21,19 @@ function BuildItems({ build }: { build: buildData | undefined }) {
 
     return (
         <div className="block text-left">
-            {/* Dropdown */}
-            <select
-                value={selectedSetId}
-                onChange={(e) => setSelectedSetId(Number(e.target.value))}
-                className="mb-4 p-2 border rounded"
-            >
-                {sets.map((set: any) => (
-                    <option key={set.ID} value={set.ID}>
-                        {set.Title}
-                    </option>
-                ))}
-            </select>
+            {selectedSet.size > 0 ? (
+                <select
+                    value={selectedSetId}
+                    onChange={(e) => setSelectedSetId(Number(e.target.value))}
+                    className="mb-4 p-2 border rounded"
+                >
+                    {sets.map((set: any) => (
+                        <option key={set.ID} value={set.ID}>
+                            {set.Title}
+                        </option>
+                    ))}
+                </select>
+            ) : null}
 
             {/* Items */}
             <div>
