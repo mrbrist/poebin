@@ -21,7 +21,7 @@ function BuildItems({ build }: { build: buildData | undefined }) {
 
     return (
         <div className="block text-left">
-            {selectedSet.size > 0 ? (
+            {sets.length > 1 ? (
                 <select
                     value={selectedSetId}
                     onChange={(e) => setSelectedSetId(Number(e.target.value))}
