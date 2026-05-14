@@ -60,6 +60,12 @@ function Build() {
             <div className="px-6 mb-5">
                 <BuildNotes build={build} />
             </div>
+            <footer className="bg-neutral-primary-soft flex justify-center items-center p-4">
+                <span className="text-sm text-slate-500 text-center">
+                    poeb.in isn't affiliated with or endorsed by Grinding Gear
+                    Games in any way
+                </span>
+            </footer>
         </div>
     );
 }
