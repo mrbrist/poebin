@@ -2,6 +2,11 @@ import { type buildData } from "../api/getBuild";
 import { timeAgo } from "../helpers/timeAgo";
 
 function BuildSide({ build }: { build: buildData | undefined }) {
+    const buildClass =
+        build?.Data.Build.AscendClassName == "None"
+            ? build.Data.Build.ClassName
+            : build?.Data.Build.AscendClassName;
+
     function copyBuildToClipboard() {
         if (build?.Raw) {
             navigator.clipboard.writeText(build.Raw);
@@ -11,6 +16,17 @@ function BuildSide({ build }: { build: buildData | undefined }) {
         <aside className="col-span-3 space-y-6">
             <div className="rounded-2xl bg-slate-900 border border-slate-400 p-4 shadow-lg">
                 <h2 className="text-lg font-semibold mb-4">Build Info</h2>
+                {buildClass ? (
+                    <div className="w-full flex justify-center">
+                        <img
+                            // This may need to change to local at some point if rate limits happen
+                            src={`https://assets.poe.ninja/poe1/classes/${buildClass.toLowerCase()}.webp`}
+                            alt={buildClass}
+                            className="w-auto rounded-xl border border-slate-700 mb-4"
+                        />
+                    </div>
+                ) : null}
+
                 <div className="space-y-2 text-sm text-zinc-400">
                     <div>
                         <span className="text-zinc-200">Class:</span>{" "}
