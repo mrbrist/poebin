@@ -58,7 +58,7 @@ function BuildMain({ build }: { build: buildData | undefined }) {
                     }`}
                     onClick={() => handleTabChange("tree")}
                 >
-                    Tree
+                    Passives
                 </button>
 
                 {/* Uncomment when skills tab is ready */}
