@@ -35,7 +35,7 @@ type PathOfBuilding struct {
 type Build struct {
 	Level            uint8      `xml:"level,attr"`
 	ClassName        string     `xml:"className,attr"`
-	AscendClassName  *string    `xml:"ascendClassName,attr,omitempty"`
+	AscendClassName  string     `xml:"ascendClassName,attr"`
 	Bandit           *string    `xml:"bandit,attr,omitempty"`
 	PantheonMajorGod *string    `xml:"pantheonMajorGod,attr,omitempty"`
 	PantheonMinorGod *string    `xml:"pantheonMinorGod,attr,omitempty"`

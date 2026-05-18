@@ -80,8 +80,8 @@ func (r2 *R2) NewBuild(raw string) (string, uint8, string, error) {
 	}
 
 	asc := build.Build.ClassName
-	if build.Build.AscendClassName != nil {
-		asc = *build.Build.AscendClassName
+	if build.Build.AscendClassName != "None" {
+		asc = build.Build.AscendClassName
 	}
 
 	return id, build.Build.Level, asc, nil

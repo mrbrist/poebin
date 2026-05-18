@@ -23,6 +23,15 @@ async function handleRecent(set: any) {
     set(recent);
 }
 
+function getBuildClass(b: buildData) {
+    const buildClass =
+        b?.Data.Build.AscendClassName == "None"
+            ? b.Data.Build.ClassName
+            : b?.Data.Build.AscendClassName;
+
+    return buildClass;
+}
+
 function App() {
     const [paste, setPaste] = useState("");
     const [recent, setRecent] = useState<buildDataArr>();
@@ -73,7 +82,7 @@ function App() {
                                 className="flex items-center gap-3 rounded-lg bg-slate-800/70 px-4 py-3 transition hover:bg-slate-700/70"
                             >
                                 <img
-                                    src="https://placehold.co/100"
+                                    src={`https://assets.poe.ninja/poe1/classes/${r.Class.toLowerCase()}.webp`}
                                     alt="Class avatar"
                                     className="h-10 w-10 rounded-full object-cover"
                                 />
