@@ -25,26 +25,38 @@ function BuildTree({ build }: { build: buildData | undefined }) {
     function lookupNode(node: string) {
         const data = rawTreeData.nodes?.[node];
 
-        // Prevent crashes if node doesn't exist
+        // Always return a safe object
         if (!data) {
             return {
                 name: "Unknown Node",
                 text: "",
                 ascendancyNode: false,
+                isNotable: false,
             };
         }
 
         return {
             name: data.name ?? "Unnamed Node",
-            text: data.stats?.join(", ") ?? "",
-            ascendancyNode: data.ascendancyName ? true : false,
-            isNotable: data.isNotable ? true : false,
+            text: Array.isArray(data.stats) ? data.stats.join(", ") : "",
+            ascendancyNode: !!data.ascendancyName,
+            isNotable: !!data.isNotable,
         };
     }
 
-    function getPassiveSkillData(tree: { Sockets: any; Nodes: string }) {
+    function getPassiveSkillData(tree: { Sockets?: any[]; Nodes?: string }) {
+        // Prevent crashes from malformed tree data
+        if (!tree?.Nodes) {
+            return {
+                treeNodes: [],
+                ascendancyNodes: [],
+                socketCount: 0,
+            };
+        }
+
         const nodes = tree.Nodes.split(",");
-        const socketCount = tree.Sockets.length;
+        const socketCount = Array.isArray(tree.Sockets)
+            ? tree.Sockets.length
+            : 0;
 
         const treeNodes = [];
         const ascendancyNodes = [];
@@ -52,8 +64,7 @@ function BuildTree({ build }: { build: buildData | undefined }) {
         for (let i = 0; i < nodes.length; i++) {
             const n = lookupNode(nodes[i]);
 
-            // Only include notable nodes
-            if (!n.isNotable) continue;
+            if (!n?.isNotable) continue;
 
             if (n.ascendancyNode) {
                 ascendancyNodes.push(n);
@@ -87,21 +98,72 @@ function BuildTree({ build }: { build: buildData | undefined }) {
                 </select>
             )}
 
-            <div>
-                This tree has{" "}
-                <span className="text-fuchsia-500">{treeData.socketCount}</span>{" "}
-                sockets allocated.
-                {treeData.treeNodes.map((node) => (
-                    <div>
-                        {node.name}: {node.text}
-                    </div>
-                ))}
-                ----
-                {treeData.ascendancyNodes.map((node) => (
-                    <div>
-                        {node.name}: {node.text}
-                    </div>
-                ))}
+            <div className="rounded-2xl bg-slate-900 border border-slate-400 p-6 shadow-lg mt-6">
+                <div className="mb-3 text-sm text-zinc-400">
+                    This tree has{" "}
+                    <span className="text-fuchsia-400 font-semibold">
+                        {treeData.socketCount}
+                    </span>{" "}
+                    jewel sockets allocated.
+                </div>
+
+                {/* Ascendancy */}
+                <div className="mb-6">
+                    <h3 className="text-md font-semibold text-zinc-200 mb-3">
+                        Ascendancy
+                    </h3>
+
+                    {treeData.ascendancyNodes.length > 0 ? (
+                        <div className="space-y-3">
+                            {treeData.ascendancyNodes.map((node, index) => (
+                                <div
+                                    key={index}
+                                    className="bg-slate-800 p-4 rounded-xl border border-amber-700"
+                                >
+                                    <div className="text-amber-400 font-medium mb-1">
+                                        {node.name}
+                                    </div>
+                                    <div className="text-sm text-zinc-400">
+                                        {node.text}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-sm text-zinc-500">
+                            No ascendancy passives allocated.
+                        </div>
+                    )}
+                </div>
+
+                {/* Regular */}
+                <div>
+                    <h3 className="text-md font-semibold text-zinc-200 mb-3">
+                        Notables
+                    </h3>
+
+                    {treeData.treeNodes.length > 0 ? (
+                        <div className="space-y-3">
+                            {treeData.treeNodes.map((node, index) => (
+                                <div
+                                    key={index}
+                                    className="bg-slate-800 p-4 rounded-xl border border-slate-700"
+                                >
+                                    <div className="text-fuchsia-400 font-medium mb-1">
+                                        {node.name}
+                                    </div>
+                                    <div className="text-sm text-zinc-400">
+                                        {node.text}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-sm text-zinc-500">
+                            No notable passives allocated.
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );
