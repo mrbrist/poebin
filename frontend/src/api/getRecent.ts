@@ -15,7 +15,7 @@ export async function getRecent() {
         });
         if (!res.ok) throw new Error("Failed to get recent builds");
         const recent: buildDataArr = await res.json();
-        return recent;
+        return recent.reverse();
     } catch (err) {
         // Display error to user
         console.log(err);

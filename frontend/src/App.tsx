@@ -23,15 +23,6 @@ async function handleRecent(set: any) {
     set(recent);
 }
 
-function getBuildClass(b: buildData) {
-    const buildClass =
-        b?.Data.Build.AscendClassName == "None"
-            ? b.Data.Build.ClassName
-            : b?.Data.Build.AscendClassName;
-
-    return buildClass;
-}
-
 function App() {
     const [paste, setPaste] = useState("");
     const [recent, setRecent] = useState<buildDataArr>();
