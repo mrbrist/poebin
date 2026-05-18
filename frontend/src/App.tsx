@@ -38,7 +38,7 @@ function App() {
     return (
         <div className="h-screen flex flex-col">
             <div className="flex justify-center p-4">
-                <div className="w-full max-w-2xl rounded-2xl p-6">
+                <div className="w-full max-w-2xl rounded-2xl">
                     <h1 className="text-2xl font-semibold mb-4 text-slate-100">
                         poeb.in
                     </h1>

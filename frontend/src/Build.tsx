@@ -48,7 +48,7 @@ function Build() {
     return (
         <div className="min-h-screen text-zinc-100">
             <h1
-                className="text-2xl font-semibold mb-4 mt-4 text-slate-100 cursor-pointer"
+                className="text-2xl font-semibold mt-4 text-slate-100 cursor-pointer"
                 onClick={() => navigate("/")}
             >
                 poeb.in
