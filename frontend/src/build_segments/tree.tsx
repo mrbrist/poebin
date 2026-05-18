@@ -98,7 +98,7 @@ function BuildTree({ build }: { build: buildData | undefined }) {
                 </select>
             )}
 
-            <div className="rounded-2xl bg-slate-900 border border-slate-400 p-6 shadow-lg mt-6">
+            <div className="rounded-2xl bg-slate-900">
                 <div className="mb-3 text-sm text-zinc-400">
                     This tree has{" "}
                     <span className="text-fuchsia-400 font-semibold">
