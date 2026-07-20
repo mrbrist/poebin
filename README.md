@@ -10,7 +10,7 @@ This is one of several projects on my journey to learning the Go + Typescript te
 
 The solution that I landed on was Cloudfare R2 which works perfectly for this project as it allows for single file storage and is cheaper than alternatives like AWS.
 
-# How it Works
+## How it Works
 This project functions as a pastebin site where the user pastes in a large string of text (exported from Path of Building) and the result is displayed in a nice way so the user can share builds with friends.
 
 There are a few other sites that do the same thing which allows me to measure the success of this project by looking at how others have achieved the same result.
