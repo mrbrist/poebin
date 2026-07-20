@@ -1,5 +1,5 @@
 # POEBIN
-[//]: <![example](https://github.com/mrbrist/grandexchange-tracker/blob/main/example.png "example image")>
+![example](https://github.com/mrbrist/poebin/blob/main/example.png "example image")
 
 A Path of Exile build sharing tool
 
